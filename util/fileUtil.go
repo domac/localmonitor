@@ -26,6 +26,42 @@ func GetFullPath(path string) string {
 	return abPath
 }
 
+//文件复制
+func CopyFile(src, dst string) (written int64, err error) {
+	srcFile, err := os.Open(src)
+	if err!=nil {
+		fmt.Println(err.Error())
+		return
+	}
+	defer srcFile.Close()
+
+	srcFileName := GetFileName(src)
+	srcFileName = srcFileName+"_"+time.Now().String()
+	dstName := filepath.Join(dst, srcFileName)
+	fmt.Println("dstName==>",dstName)
+
+	dstFile, err := os.Create(dstName)
+
+	if err!=nil {
+		fmt.Println(err.Error())
+		return
+	}
+
+	defer dstFile.Close()
+
+	return io.Copy(dstFile, srcFile)
+
+}
+
+
+func GetFileName(fullpath string) string {
+	fi, err := os.Stat(fullpath)
+	if err!= nil {
+		return ""
+	}
+	return fi.Name()
+}
+
 //检查文件是否存在
 func CheckFileIsExist() bool {
 	_, err := os.Stat(OutputFileName)

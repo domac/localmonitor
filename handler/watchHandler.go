@@ -17,9 +17,13 @@ func WatcherAsyncListen() {
 			log.Println("event:", event)
 			if event.Op&fsnotify.Write == fsnotify.Write { //修改文件
 
-				fmt.Println(">>",event.Name,"[edit]")
+				fmt.Println(">>", event.Name, "[edit]")
 
 				oldMd5, ok := util.Md5Map[event.Name]
+
+				//把文件备份到远程文件夹
+				util.CopyFile(event.Name, util.BAK_PATH)
+
 				if ok {
 					newMd5Str := util.GenerateMd5(event.Name)
 					if newMd5Str != oldMd5 {
@@ -34,7 +38,7 @@ func WatcherAsyncListen() {
 
 			}else if event.Op&fsnotify.Create == fsnotify.Create {//创建文件
 
-				fmt.Println(">>",event.Name,"[create]")
+				fmt.Println(">>", event.Name, "[create]")
 
 				fileInfo, err := os.Stat(event.Name)
 				if err == nil && fileInfo.IsDir() {
@@ -49,7 +53,7 @@ func WatcherAsyncListen() {
 
 			} else if event.Op&fsnotify.Remove == fsnotify.Remove {//移除文件
 
-				fmt.Println(">>",event.Name,"[remove]")
+				fmt.Println(">>", event.Name, "[remove]")
 
 				if _, ok := util.Md5Map[event.Name]; ok {
 					delete(util.Md5Map, event.Name)
@@ -57,7 +61,7 @@ func WatcherAsyncListen() {
 				}
 			}else if event.Op&fsnotify.Rename == fsnotify.Rename {//重命名文件
 
-				fmt.Println(">>",event.Name,"[rename]")
+				fmt.Println(">>", event.Name, "[rename]")
 
 				if _, ok := util.Md5Map[event.Name]; ok {
 					delete(util.Md5Map, event.Name)
@@ -93,7 +97,7 @@ func TimerCheck() {
 			}
 			if len(content) >0 {
 				util.ChangedMap = make(map[int]*list.List)
-				go SendMail(content)//发送邮件
+				//go SendMail(content)//发送邮件
 			}
 			util.Locker.Unlock()
 		}

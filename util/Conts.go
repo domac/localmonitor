@@ -7,6 +7,8 @@ import (
 
 var (
 
+	BAK_PATH string = "/Users/lihaoquan/GoProjects/Reference/temp_bak"
+
 	Locker sync.Mutex
 
 	OutputFileName string = "filesName.csv"
